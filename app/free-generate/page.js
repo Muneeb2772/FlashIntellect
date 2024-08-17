@@ -47,28 +47,6 @@ export default function Generate(){
     const [name, setName] = useState('')
     const [open, setOpen] = useState(false)
     
-    useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        const res = await fetch(`/api/getUserStatus?userId=${user.id}`);
-        const data = await res.json();
-        if (data.subscriptionStatus === 'paid') {
-          setIsPaid(true);
-        } else {
-          router.push('/'); // Redirect to pricing page if not paid
-        }
-      } catch (error) {
-        console.error("Error checking user status:", error);
-        router.push('/');
-      }
-    };
-
-    checkUserStatus();
-  }, [user]);
-
-  if (!isPaid) {
-    return <div>Loading...</div>;
-  }
 
     const handleSubmit = async () => {
         fetch('/api/generate/', {

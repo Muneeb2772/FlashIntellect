@@ -1,12 +1,43 @@
 'use client'
 
 import StyleOutlinedIcon from '@mui/icons-material/StyleOutlined';
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
 import { AppBar, Box, Button, Container, createTheme, CssBaseline, Divider, Grid, ThemeProvider, Toolbar, Typography, Card, CardContent, CardActions } from "@mui/material";
 import Link from "next/link";
 import IconButton from '@mui/material/IconButton';
+import getStripe from '@/utils/get-stripe';
+import { useEffect,useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+
 
 export default function Home() {
+  
+  const [isPaid, setIsPaid] = useState(false);
+  const { isLoaded, isSignedIn, user } = useUser();
+  const router = useRouter();
+
+  
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const res = await fetch(`/api/getUserStatus?userId=${user.id}`);
+        const data = await res.json();
+        if (data.subscriptionStatus === 'paid') {
+          setIsPaid(true);
+        } else {
+          router.push('/'); // Redirect to pricing page if not paid
+        }
+      } catch (error) {
+        router.push('/');
+      }
+    };
+
+    checkUserStatus();
+  }, [user]);
+
+
+  
   const theme = createTheme({
     palette: {
       primary: {
@@ -26,7 +57,33 @@ export default function Home() {
         secondary: '#e5e7eb',
       },
     },
+
   });
+
+  const handleSubmit = async () => {
+    const checkoutSession = await fetch('/api/checkout_sessions',{
+      method:'POST',
+      headers:{
+        origin:'http://localhost:3000',
+      },
+    })
+    const checkoutSessionJson = await checkoutSession.json()
+
+    if (checkoutSessionJson.statusCode === 500){
+      console.error(checkoutSessionJson.message)
+      return
+    }
+
+    const stripe = await getStripe()
+    const {error} = await stripe.redirectToCheckout({
+      sessionId: checkoutSessionJson.id,
+    })
+
+    if (error){
+      console.warn(error.message)
+    }
+
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -68,7 +125,8 @@ export default function Home() {
           
           <SignedIn>
           <Button variant="contained" color='primary' sx={{ mb: 2 }}><Link href='/generate' style ={{textDecoration:'none', color:"white"}} passHref> Get Started
-          </Link> </Button></SignedIn>
+          </Link> </Button>
+          </SignedIn>
         </Box>
         <Divider color='secondary.main'></Divider>
 
@@ -113,16 +171,16 @@ export default function Home() {
                 <CardContent>
                   <Typography variant='h5' fontWeight='bold'>Basic</Typography>
                   <Typography variant='h6' color={theme.palette.text.secondary}>
-                    $2.99/month
+                    Free
                   </Typography>
                   <Typography variant='body1' mt={1}>
                     Basic features and limited storage.
                   </Typography>
+                  <Typography variant='body1' mt={1} textAlign='center'> Every signedin account has it.</Typography>
                 </CardContent>
                 <CardActions>
-                  <Button fullWidth variant='contained' color='secondary'>
-                    Choose Basic
-                  </Button>
+                <Button variant="contained" color='primary' sx={{ mb: 2 }} fullWidth ><Link href='/free-generate' style ={{textDecoration:'none', color:"white"}} passHref> Generate
+                </Link> </Button>
                 </CardActions>
               </Card>
             </Grid>
@@ -138,26 +196,15 @@ export default function Home() {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button fullWidth variant='contained' color='secondary'>
-                    Choose Pro
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText }}>
-                <CardContent>
-                  <Typography variant='h5' fontWeight='bold'>Enterprise</Typography>
-                  <Typography variant='h6' color={theme.palette.text.secondary}>
-                    $19.99/month
-                  </Typography>
-                  <Typography variant='body1' mt={1}>
-                    Unlimited flashcards & Storage and priority support.
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button fullWidth variant='contained' color='secondary'>
-                    Choose Enterprise
+                <Button
+                    fullWidth
+                    variant='contained'
+                    color='secondary'
+                    onClick={handleSubmit}
+                    disabled={isPaid ===true}
+                  >
+                    {isPaid === true ? 'Paid' : 'Choose Pro'}
+
                   </Button>
                 </CardActions>
               </Card>

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { SignIn } from "@clerk/clerk-react";
 import { SignUp } from "@clerk/nextjs";
-import StyleOutlinedIcon from '@mui/icons-material/StyleOutlined';
+    import StyleOutlinedIcon from '@mui/icons-material/StyleOutlined';
 import { AppBar, Box, Button, Container, createTheme, CssBaseline, Grid, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import Link from "next/link";
 
