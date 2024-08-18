@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
 import { Box, Container,  Typography, CircularProgress, Button } from "@mui/material";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 
-const resultPage = () => {
-  const router = useRouter()
+const ResultPage = () => {
   const searchParams = useSearchParams()
   const session_id = searchParams.get('session_id')
   const [loading, setLoading] = useState(true)
@@ -104,4 +102,4 @@ const resultPage = () => {
 }
 
 
- export default resultPage 
+ export default ResultPage 

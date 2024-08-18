@@ -5,7 +5,6 @@ import { AppBar, Box, Button, Card, CardActionArea, CardContent, Container, crea
 import { collection, doc, getDoc, writeBatch } from "firebase/firestore"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import StyleOutlinedIcon from '@mui/icons-material/StyleOutlined';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackSharpIcon from '@mui/icons-material/ArrowBackSharp';
 
