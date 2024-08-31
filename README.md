@@ -9,9 +9,9 @@ Technologies Used
 Frontend:
 React
 Next.js
-CSS/SCSS
+Mui
 Backend:
-[Specify if any backend technology or API used]
+Firebase, OpenRouter API
 Hosting:
 Vercel
 Installation
